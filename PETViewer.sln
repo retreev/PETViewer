@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PETViewer", "PETViewer\PETViewer.csproj", "{48AF1872-44D8-43B7-A872-8B75984B0C9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{B89CD8FA-2E13-43DB-90C2-C8F2645BCF9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tutorial", "Tutorial\Tutorial.csproj", "{CA915DD6-9C43-4FEC-81D1-11789343D44E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{48AF1872-44D8-43B7-A872-8B75984B0C9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48AF1872-44D8-43B7-A872-8B75984B0C9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48AF1872-44D8-43B7-A872-8B75984B0C9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48AF1872-44D8-43B7-A872-8B75984B0C9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B89CD8FA-2E13-43DB-90C2-C8F2645BCF9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B89CD8FA-2E13-43DB-90C2-C8F2645BCF9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B89CD8FA-2E13-43DB-90C2-C8F2645BCF9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B89CD8FA-2E13-43DB-90C2-C8F2645BCF9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA915DD6-9C43-4FEC-81D1-11789343D44E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA915DD6-9C43-4FEC-81D1-11789343D44E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA915DD6-9C43-4FEC-81D1-11789343D44E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA915DD6-9C43-4FEC-81D1-11789343D44E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
