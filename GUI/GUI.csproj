@@ -1,23 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <PackageVersion>0.0.1</PackageVersion>
         <Authors>teatwig</Authors>
         <LangVersion>8</LangVersion>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Common\Common.csproj" />
+        <ProjectReference Include="..\Common\Common.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Resources" />
+        <None Remove="Shader\*"/>
+        <EmbeddedResource Include="Shader\*"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="OpenToolkit.Windowing.Desktop" Version="4.0.0-pre7" />
+        <PackageReference Include="OpenToolkit.Windowing.Desktop" Version="4.0.0-pre8"/>
     </ItemGroup>
 
 </Project>

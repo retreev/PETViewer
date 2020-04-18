@@ -109,32 +109,32 @@ namespace Common
             GL.Uniform1(GL.GetUniformLocation(Id, name), value);
         }
 
-        public void SetVector2(string name, Vector2 value)
+        public void SetVec2(string name, Vector2 value)
         {
             GL.Uniform2(GL.GetUniformLocation(Id, name), value.X, value.Y);
         }
 
-        public void SetVector3(string name, Vector3 value)
+        public void SetVec3(string name, Vector3 value)
         {
             GL.Uniform3(GL.GetUniformLocation(Id, name), value.X, value.Y, value.Z);
         }
 
-        public void SetVector4(string name, Vector4 value)
+        public void SetVec4(string name, Vector4 value)
         {
             GL.Uniform4(GL.GetUniformLocation(Id, name), value.X, value.Y, value.Z, value.W);
         }
 
-        public void SetMatrix2(string name, Matrix2 value)
+        public void SetMat2(string name, Matrix2 value)
         {
             GL.UniformMatrix2(GL.GetUniformLocation(Id, name), true, ref value);
         }
 
-        public void SetMatrix3(string name, Matrix3 value)
+        public void SetMat3(string name, Matrix3 value)
         {
             GL.UniformMatrix3(GL.GetUniformLocation(Id, name), true, ref value);
         }
 
-        public void SetMatrix4(string name, Matrix4 value)
+        public void SetMat4(string name, Matrix4 value)
         {
             GL.UniformMatrix4(GL.GetUniformLocation(Id, name), true, ref value);
         }
@@ -151,11 +151,11 @@ namespace Common
         // This section is dedicated to cleaning up the shader after it's finished.
         // Doing this solely in a finalizer results in a crash because of the Object-Oriented Language Problem
         // ( https://www.khronos.org/opengl/wiki/Common_Mistakes#The_Object_Oriented_Language_Problem )
-        private bool disposedValue;
+        private bool _disposedValue;
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
@@ -164,7 +164,7 @@ namespace Common
 
                 GL.DeleteProgram(Id);
 
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 

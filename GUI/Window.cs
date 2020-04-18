@@ -28,16 +28,24 @@ namespace GUI
             new NativeWindowSettings {Size = new Vector2i {X = width, Y = height}, Title = title}
         ) { }
 
+        public void Run(string modelPath)
+        {
+            _ourModel = new Model(modelPath);
+            
+            base.Run();
+        }
+        
         protected override void OnLoad()
         {
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
             GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            GL.Disable(EnableCap.CullFace);
 
             _ourShader = new Shader("Shaders/shader.vert",
                 "Shaders/shader.frag");
-
-            _ourModel = new Model("Resources/test_models/item0_01.pet");
 
             // We initialize the camera so that it is 3 units back from where the rectangle is
             // and give it the proper aspect ratio
@@ -61,14 +69,14 @@ namespace GUI
 
             _ourShader.Use();
 
-            _ourShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
-            _ourShader.SetMatrix4("view", _camera.GetViewMatrix());
+            _ourShader.SetMat4("projection", _camera.GetProjectionMatrix());
+            _ourShader.SetMat4("view", _camera.GetViewMatrix());
 
             // var model = Matrix4.Identity * Matrix4.CreateRotationX((float) MathHelper.DegreesToRadians(time));
             var model = Matrix4.Identity
                         * Matrix4.CreateTranslation(new Vector3(0f, -1.75f, 0f))
                         * Matrix4.CreateScale(.2f);
-            _ourShader.SetMatrix4("model", model);
+            _ourShader.SetMat4("model", model);
 
             _ourModel.Draw(_ourShader);
 

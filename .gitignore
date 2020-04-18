@@ -435,4 +435,4 @@ fabric.properties
 
 # End of https://www.gitignore.io/api/rider,csharp,visualstudiocode
 
-/GUI/Resources/test_models/
+/test_models/
