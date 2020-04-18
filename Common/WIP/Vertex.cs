@@ -3,7 +3,7 @@ using OpenToolkit.Mathematics;
 
 namespace Common.WIP
 {
-    [StructLayout(LayoutKind.Sequential, Size = 8 * sizeof(float), Pack = 1)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Vertex
     {
         // 3 * float

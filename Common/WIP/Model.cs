@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using OpenToolkit.Graphics.OpenGL4;
 using PangLib.PET;
@@ -39,36 +40,19 @@ namespace Common.WIP
             PETFile pet = new PETFile(fileStream);
 
             MeshHelper.CreateVerticesAndIndices(pet, out var vertices, out var indices);
-            var petTextures = pet.Textures;
-            var petTextureMap = pet.Mesh.TextureMap;
 
             List<Texture> textures = new List<Texture>();
 
-            // TODO how do we know which type a texture has?
-            for (var i = 0; i < petTextures.Count; i++)
+            // only create an array with all textures for now
+            // handling specular textures etc. can be done some other time, hopefully
+            Texture texture = new Texture
             {
-                var petTexture = petTextures[i];
-                string petTexturePath = Path.Combine(_modelDirectory, petTexture.FileName);
-                Texture texture = new Texture
-                {
-                    Path = petTexturePath,
-                    Id = LoadTextureFromFile(petTexturePath)
-                };
+                // Path = petTexturePath,
+                Id = LoadTextures(pet),
+                Type = "texture_array"
+            };
 
-                // TODO maybe specular textures are identified by the starting "!"
-                // pure diffuse by starting "]"
-                // has mask by starting with "~[2#"
-                if (petTexture.FileName.Contains("specular"))
-                {
-                    texture.Type = "texture_specular";
-                }
-                else
-                {
-                    texture.Type = "texture_diffuse";
-                }
-
-                textures.Add(texture);
-            }
+            textures.Add(texture);
 
             _meshes = new List<Mesh>
             {
@@ -76,30 +60,27 @@ namespace Common.WIP
             };
         }
 
-        private uint LoadTextureFromFile(string path)
+        private uint LoadTextures(PETFile pet)
         {
             GL.GenTextures(1, out uint textureId);
-
-            byte[] data = LoadImageAsBytes(path, out var width, out var height, out var isMasked);
-
             GL.BindTexture(TextureTarget.Texture2D, textureId);
+                
+            string petTexturePath = Path.Combine(_modelDirectory, pet.Textures[0].FileName);
+            byte[] data = LoadImageAsBytes(petTexturePath, out var width, out var height, out var isMasked);
+        
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
                 PixelFormat.Rgba, PixelType.UnsignedByte, data);
+
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
-            // // Now, set the wrapping mode. S is for the X axis, and T is for the Y axis.
-            // // We set this to Repeat so that textures will repeat when wrapped. Not demonstrated here since the texture coordinates exactly match
-            // GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,
-            //     (int) TextureWrapMode.Repeat);
-            // GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
-            //     (int) TextureWrapMode.Repeat);
-            // // First, we set the min and mag filter. These are used for when the texture is scaled down and up, respectively.
-            // // Here, we use Linear for both. This means that OpenGL will try to blend pixels, meaning that textures scaled too far will look blurred.
-            // // You could also use (amongst other options) Nearest, which just grabs the nearest pixel, which makes the texture look pixelated if scaled too far.
-            // GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-            //     (int) TextureMinFilter.LinearMipmapLinear);
-            // GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
-            //     (int) TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,
+                (int) TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
+                (int) TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+                (int) TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
+                (int) TextureMagFilter.Linear);
 
             return textureId;
         }

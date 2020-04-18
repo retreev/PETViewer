@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using OpenToolkit.Mathematics;
 using PangLib.PET;
@@ -11,30 +12,44 @@ namespace Common.WIP
     {
         public static void CreateVerticesAndIndices(PETFile pet, out List<Vertex> vertices, out List<uint> indices)
         {
+            Polygon[] petPolygons = pet.Mesh.Polygons;
+
             // create unique vertices with the index used in the polygons
             Vector3[] uniqueVertices = pet.Mesh.Vertices
                 .Select(vertex => new Vector3(vertex.X, vertex.Y, vertex.Z))
                 .ToArray();
 
+            uint[] textureLayerNrByPolyId = pet.Mesh.TextureMap;
+
+            Debug.Assert(petPolygons.Length == textureLayerNrByPolyId.Length);
+
             // every unique vertex can appear multiple times in a model (at points where polygons touch each other)
             vertices = new List<Vertex>();
-            foreach (Polygon petPoly in pet.Mesh.Polygons)
+            indices = new List<uint>();
+            for (var polyId = 0; polyId < petPolygons.Length; polyId++)
             {
-                // 3, one for each vertex of a triangle
-                foreach (PolygonIndex ppi in petPoly.PolygonIndices)
+                Polygon petPoly = petPolygons[polyId];
+                Debug.Assert(petPoly.PolygonIndices.Length == 3);
+                for (var j = 0; j < petPoly.PolygonIndices.Length; j++)
                 {
+                    PolygonIndex ppi = petPoly.PolygonIndices[j];
+                    int vertexId = polyId * 3 + j; // index for accessing texture layer nr
                     Vertex vertex = new Vertex
                     {
                         Position = uniqueVertices[ppi.Index],
                         Normal = new Vector3(ppi.X, ppi.Y, ppi.Z),
-                        TexCoords = new Vector2(ppi.UVMappings[0].U, ppi.UVMappings[0].V) // TODO handle multiple TexCoords
+                        TexCoords = new Vector2(
+                            ppi.UVMappings[0].U, ppi.UVMappings[0].V)
                     };
                     vertices.Add(vertex);
+                    indices.Add((uint) vertexId);
                 }
             }
 
-            indices = Enumerable.Range(0, vertices.Count).Select(i => (uint) i).ToList();
-            
+            Debug.Assert(vertices.Count == 3 * petPolygons.Length);
+
+            Debug.Assert(indices.Count == vertices.Count);
+
             // Mesh mesh = new Mesh(vertices, indices, textures)
             // {
             //     vertices = CreateVertices(pet.Mesh),

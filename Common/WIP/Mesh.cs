@@ -38,26 +38,29 @@ namespace Common.WIP
             uint normalNr = 1;
             uint heightNr = 1;
 
-            for (var i = 0; i < _textures.Count; i++)
-            {
-                // activate proper texture unit before binding
-                GL.ActiveTexture((TextureUnit) ((int) TextureUnit.Texture0 + i));
-                // retrieve texture number (the N in diffuse_textureN)
-                string name = _textures[i].Type;
-                string number = name switch
-                {
-                    "texture_diffuse" => (diffuseNr++).ToString(),
-                    "texture_specular" => (specularNr++).ToString(),
-                    "texture_normal" => (normalNr++).ToString(),
-                    "texture_height" => (heightNr++).ToString(),
-                    _ => ""
-                };
-
-                // now set the sampler to the correct texture unit
-                shader.SetInt($"{name}{number}", i);
-                // and finally bind the texture
-                GL.BindTexture(TextureTarget.Texture2D, _textures[i].Id);
-            }
+            GL.ActiveTexture(TextureUnit.Texture0);
+            shader.SetInt("texture_array", 0);
+            GL.BindTexture(TextureTarget.Texture2D, _textures[0].Id);
+            // for (var i = 0; i < _textures.Count; i++)
+            // {
+            //     // activate proper texture unit before binding
+            //     GL.ActiveTexture((TextureUnit) ((int) TextureUnit.Texture0 + i));
+            //     // retrieve texture number (the N in diffuse_textureN)
+            //     string name = _textures[i].Type;
+            //     string number = name switch
+            //     {
+            //         "texture_diffuse" => (diffuseNr++).ToString(),
+            //         "texture_specular" => (specularNr++).ToString(),
+            //         "texture_normal" => (normalNr++).ToString(),
+            //         "texture_height" => (heightNr++).ToString(),
+            //         _ => ""
+            //     };
+            //
+            //     // now set the sampler to the correct texture unit
+            //     shader.SetInt($"{name}{number}", i);
+            //     // and finally bind the texture
+            //     GL.BindTexture(TextureTarget.Texture2D, _textures[i].Id);
+            // }
 
             // draw mesh
             GL.BindVertexArray(_vao);

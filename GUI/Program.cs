@@ -4,7 +4,7 @@
     {
         private static void Main(string[] args)
         {
-            var modelPath = "../test_models/item0_01.pet";
+            var modelPath = "C:/Users/timo/git/PETViewer/test_models/item0_01.pet";
             if (args.Length > 0)
             {
                 modelPath = args[0];

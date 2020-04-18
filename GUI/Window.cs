@@ -1,10 +1,13 @@
-﻿using Common;
+﻿using System;
+using System.Runtime.InteropServices;
+using Common;
 using Common.WIP;
 using OpenToolkit.Graphics.OpenGL4;
 using OpenToolkit.Mathematics;
 using OpenToolkit.Windowing.Common;
 using OpenToolkit.Windowing.Common.Input;
 using OpenToolkit.Windowing.Desktop;
+using OpenToolkit.Windowing.GraphicsLibraryFramework;
 using static Common.Camera;
 
 namespace GUI
@@ -23,20 +26,30 @@ namespace GUI
 
         private double _time;
 
+        private double _lastTime = GLFW.GetTime();
+        private int _nbFrames = 0;
+
+        private readonly string _applicationTitle;
+
         public Window(int width, int height, double updateFrequency, string title) : base(
             new GameWindowSettings {UpdateFrequency = updateFrequency},
             new NativeWindowSettings {Size = new Vector2i {X = width, Y = height}, Title = title}
-        ) { }
+        )
+        {
+            _applicationTitle = title;
+        }
 
         public void Run(string modelPath)
         {
             _ourModel = new Model(modelPath);
-            
+
             base.Run();
         }
-        
+
         protected override void OnLoad()
         {
+            EnableDebugging();
+
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
             GL.Enable(EnableCap.DepthTest);
@@ -132,6 +145,18 @@ namespace GUI
                 _camera.ProcessMouseMovement(deltaX, deltaY);
             }
 
+            // Measure speed (https://www.opengl-tutorial.org/miscellaneous/an-fps-counter/)
+            double currentTime = GLFW.GetTime();
+            _nbFrames++;
+            if (currentTime - _lastTime >= 1.0)
+            {
+                // If last prinf() was more than 1 sec ago
+                // printf and reset timer
+                Title = $"{_applicationTitle} | {1000.0 / _nbFrames:0.00} ms/frame ({_nbFrames} fps)";
+                _nbFrames = 0;
+                _lastTime += 1.0;
+            }
+
             base.OnUpdateFrame(e);
         }
 
@@ -178,6 +203,23 @@ namespace GUI
             _ourShader.Dispose();
 
             base.OnUnload();
+        }
+
+        // Debugging
+
+        private static void LogDebugMessage(DebugSource debugSource, DebugType type, int id, DebugSeverity severity,
+            int len, IntPtr msgPtr, IntPtr customObj)
+        {
+            var msg = Marshal.PtrToStringAnsi(msgPtr, len);
+            Console.WriteLine($"Source: {debugSource}, Type: {type}, id: {id}, Severity: {severity}, msg: '{msg}'");
+        }
+
+        private void EnableDebugging()
+        {
+            GL.Enable(EnableCap.DebugOutput);
+            GL.Enable(EnableCap.DebugOutputSynchronous);
+            var nullptr = new IntPtr(0);
+            GL.Arb.DebugMessageCallback(LogDebugMessage, nullptr);
         }
     }
 }
