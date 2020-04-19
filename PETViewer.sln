@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{6174BB51-FE6B-410F-918A-BEFBA56EB57A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PETViewer.Common", "PETViewer.Common\PETViewer.Common.csproj", "{6174BB51-FE6B-410F-918A-BEFBA56EB57A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{ED7C4840-74BC-4BFA-A929-1F12DD4904BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PETViewer.GUI", "PETViewer.GUI\PETViewer.GUI.csproj", "{ED7C4840-74BC-4BFA-A929-1F12DD4904BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

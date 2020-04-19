@@ -1,4 +1,4 @@
-namespace Common.WIP
+namespace PETViewer.Common.Model
 {
     public struct Texture
     {

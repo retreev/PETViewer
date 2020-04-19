@@ -10,7 +10,7 @@ using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace Common.WIP
+namespace PETViewer.Common.Model
 {
     public class Model
     {
@@ -139,8 +139,10 @@ namespace Common.WIP
             // But since the V coord in PET files is stored upside down it fixes itself
             // image.Mutate(x => x.Flip(FlipMode.Vertical));
 
-            // TODO remove
-            image.Mutate(x => x.Resize(maxWidth, maxHeight));
+            if (width < maxWidth || height < maxHeight)
+            {
+                image.Mutate(x => x.Resize(maxWidth, maxHeight));
+            }
 
             Debug.Assert(width <= maxWidth && height <= maxHeight);
             Console.Out.WriteLine($"  Width: {width}, Height: {height}");
@@ -197,11 +199,11 @@ namespace Common.WIP
         }
     }
 
-    struct RawImage
-    {
-        internal byte[] Pixels;
-        internal int Width;
-        internal int Height;
-        internal bool IsMasked;
-    }
+    // struct RawImage
+    // {
+    //     internal byte[] Pixels;
+    //     internal int Width;
+    //     internal int Height;
+    //     internal bool IsMasked;
+    // }
 }

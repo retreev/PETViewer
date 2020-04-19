@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <PackageVersion>0.0.1</PackageVersion>
+        <Authors>teatwig</Authors>
+        <LangVersion>8</LangVersion>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>PETViewer.GUI</RootNamespace>
+        <Product>PETViewer</Product>
+        <AssemblyName>PETViewer</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="OpenToolkit.Windowing.Desktop" Version="4.0.0-pre8" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="Shaders/**" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="Resources/**" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\PETViewer.Common\PETViewer.Common.csproj" />
+    </ItemGroup>
+
+    <Target Name="SpicNSpan" AfterTargets="Clean">
+        <!-- Remove obj folder -->
+        <RemoveDir Directories="$(BaseIntermediateOutputPath)" />
+        <!-- Remove bin folder -->
+        <RemoveDir Directories="$(BaseOutputPath)" />
+    </Target>
+</Project>

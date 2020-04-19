@@ -6,7 +6,7 @@ using PangLib.PET;
 using PangLib.PET.Models;
 using PetMesh = PangLib.PET.Models.Mesh;
 
-namespace Common.WIP
+namespace PETViewer.Common.Model
 {
     public static class MeshHelper
     {

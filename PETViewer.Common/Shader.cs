@@ -4,25 +4,22 @@ using System.Text;
 using OpenToolkit.Graphics.OpenGL4;
 using OpenToolkit.Mathematics;
 
-namespace Common
+namespace PETViewer.Common
 {
-    // A simple class meant to help create shaders.
     public class Shader : IDisposable
     {
         public int Id;
 
         public Shader(string vertPath, string fragPath, string geometryPath = null)
         {
-            // Load shaders and compile
-
-            var vShaderCode = LoadSource(vertPath);
-            var fShaderCode = LoadSource(fragPath);
             // vertex shader
+            var vShaderCode = LoadSource(vertPath);
             var vertex = GL.CreateShader(ShaderType.VertexShader);
             GL.ShaderSource(vertex, vShaderCode);
             CompileShader(vertex, "VERTEX");
 
-            // fragment Shader
+            // fragment shader
+            var fShaderCode = LoadSource(fragPath);
             var fragment = GL.CreateShader(ShaderType.FragmentShader);
             GL.ShaderSource(fragment, fShaderCode);
             CompileShader(fragment, "FRAGMENT");
@@ -37,7 +34,7 @@ namespace Common
                 CompileShader(geometry, "GEOMETRY");
             }
 
-            // shader Program
+            // create shader program
             Id = GL.CreateProgram();
             GL.AttachShader(Id, vertex);
             GL.AttachShader(Id, fragment);
@@ -48,7 +45,7 @@ namespace Common
 
             LinkProgram(Id, "PROGRAM");
 
-            // delete the shaders as they're linked into our program now and no longer necessary
+            // delete the shaders as they're now linked into the program and no longer necessary
             GL.DeleteShader(vertex);
             GL.DeleteShader(fragment);
             if (geometryPath != null)
@@ -92,7 +89,7 @@ namespace Common
             GL.UseProgram(Id);
         }
 
-        // utility uniform functions
+        /* utility uniform functions */
 
         public void SetBool(string name, bool value)
         {
@@ -139,10 +136,13 @@ namespace Common
             GL.UniformMatrix4(GL.GetUniformLocation(Id, name), true, ref value);
         }
 
-        // Just loads the entire file into a string.
+        // load the entire file into a string
         private static string LoadSource(string path)
         {
-            using (var sr = new StreamReader(path, Encoding.UTF8))
+            // when dragging a file onto the executable the base path for the stream reader somehow gets changes
+            // thus set append the base path containing the shaders manually
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            using (var sr = new StreamReader(Path.Combine(baseDirectory, path), Encoding.UTF8))
             {
                 return sr.ReadToEnd();
             }

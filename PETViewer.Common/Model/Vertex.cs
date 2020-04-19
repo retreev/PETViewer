@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using OpenToolkit.Mathematics;
 
-namespace Common.WIP
+namespace PETViewer.Common.Model
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Vertex

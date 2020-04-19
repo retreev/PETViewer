@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using OpenToolkit.Graphics.OpenGL4;
 
-namespace Common.WIP
+namespace PETViewer.Common.Model
 {
     public class Mesh
     {

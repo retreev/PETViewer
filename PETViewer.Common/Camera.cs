@@ -1,7 +1,7 @@
 using System;
 using OpenToolkit.Mathematics;
 
-namespace Common
+namespace PETViewer.Common
 {
     // This is the camera class as it could be set up after the tutorials on the website
     // It is important to note there are a few ways you could have set up this camera, for example
