@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using OpenToolkit.Graphics.OpenGL4;
 using PangLib.PET;
 using SixLabors.ImageSharp;
@@ -62,31 +63,60 @@ namespace Common.WIP
 
         private uint LoadTextures(PETFile pet)
         {
+            int maxHeight = 64;
+            int maxWidth = 64;
+
+            var petTextures = pet.Textures;
+            var layerCount = petTextures.Count;
+
+            List<byte> texels = new List<byte>();
+            // List<RawImage> images = new List<RawImage>();
+            for (var i = 0; i < layerCount; i++)
+            {
+                string petTexturePath = Path.Combine(_modelDirectory, petTextures[i].FileName);
+                byte[] data = LoadImageAsBytes(petTexturePath, maxWidth, maxHeight, out var width, out var height,
+                    out var isMasked);
+
+                texels.AddRange(data.ToList());
+
+                // images.Add(new RawImage
+                // {
+                //     Pixels = data,
+                //     Width = width,
+                //     Height = height,
+                //     IsMasked = isMasked
+                // });
+
+                // GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, i, width, height, layerCount, PixelFormat.Rgba,
+                //     PixelType.UnsignedByte, data);
+            }
+
             GL.GenTextures(1, out uint textureId);
-            GL.BindTexture(TextureTarget.Texture2D, textureId);
-                
-            string petTexturePath = Path.Combine(_modelDirectory, pet.Textures[0].FileName);
-            byte[] data = LoadImageAsBytes(petTexturePath, out var width, out var height, out var isMasked);
-        
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
-                PixelFormat.Rgba, PixelType.UnsignedByte, data);
 
-            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+            GL.BindTexture(TextureTarget.Texture2DArray, textureId);
+            GL.TexStorage3D(TextureTarget3d.Texture2DArray, 1, SizedInternalFormat.Rgba8,
+                maxWidth, maxHeight, layerCount);
 
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,
+            GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, 0,
+                maxWidth, maxHeight, layerCount, PixelFormat.Rgba, PixelType.UnsignedByte, texels.ToArray());
+
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
+
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS,
                 (int) TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT,
                 (int) TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter,
                 (int) TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter,
                 (int) TextureMagFilter.Linear);
 
             return textureId;
         }
 
         // TODO avoid loading the same texture multiple times
-        private byte[] LoadImageAsBytes(string path, out int width, out int height, out bool isMasked)
+        private byte[] LoadImageAsBytes(string path, int maxWidth, int maxHeight, out int width, out int height,
+            out bool isMasked)
         {
             // TODO don't load all as RGBA and instead find out the type, then switch over components like:
             ///GLenum format;
@@ -105,6 +135,12 @@ namespace Common.WIP
             // But since the V coord in PET files is stored upside down it fixes itself
             // image.Mutate(x => x.Flip(FlipMode.Vertical));
 
+            // TODO remove
+            image.Mutate(x => x.Resize(maxWidth, maxHeight));
+
+            Debug.Assert(width <= maxWidth && height <= maxHeight);
+            Console.Out.WriteLine($"Width: {width}, Height: {height}");
+
             // Get an array of the pixels, in ImageSharp's internal format.
             Rgba32[] tempPixels = image.GetPixelSpan().ToArray();
 
@@ -117,6 +153,10 @@ namespace Common.WIP
                 Console.Out.WriteLine($"Loading mask for '{path}': {maskPath}");
                 Image<Rgba32> maskImage = Image.Load<Rgba32>(maskPath);
                 // maskImage.Mutate(x => x.Flip(FlipMode.Vertical));
+
+                // TODO remove
+                image.Mutate(x => x.Resize(maxWidth, maxHeight));
+
                 maskTempPixels = maskImage.GetPixelSpan().ToArray();
             }
 
@@ -146,5 +186,13 @@ namespace Common.WIP
             maskPath = path.Replace(".jpg", "_mask.jpg");
             return new FileInfo(maskPath).Exists;
         }
+    }
+
+    struct RawImage
+    {
+        internal byte[] Pixels;
+        internal int Width;
+        internal int Height;
+        internal bool IsMasked;
     }
 }

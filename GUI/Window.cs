@@ -14,8 +14,9 @@ namespace GUI
 {
     public class Window : GameWindow
     {
-        private Shader _ourShader;
-        private Model _ourModel;
+        private Shader _transparentShader;
+        private Shader _opaqueShader;
+        private Model _petModel;
 
         // We need an instance of the new camera class so it can manage the view and projection matrix code
         // We also need a boolean set to true to detect whether or not the mouse has been moved for the first time
@@ -41,7 +42,7 @@ namespace GUI
 
         public void Run(string modelPath)
         {
-            _ourModel = new Model(modelPath);
+            _petModel = new Model(modelPath);
 
             base.Run();
         }
@@ -57,8 +58,8 @@ namespace GUI
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.Disable(EnableCap.CullFace);
 
-            _ourShader = new Shader("Shaders/shader.vert",
-                "Shaders/shader.frag");
+            _transparentShader = new Shader("Shaders/base.vert", "Shaders/transparent.frag");
+            _opaqueShader = new Shader("Shaders/base.vert", "Shaders/opaque.frag");
 
             // We initialize the camera so that it is 3 units back from where the rectangle is
             // and give it the proper aspect ratio
@@ -80,18 +81,28 @@ namespace GUI
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            _ourShader.Use();
-
-            _ourShader.SetMat4("projection", _camera.GetProjectionMatrix());
-            _ourShader.SetMat4("view", _camera.GetViewMatrix());
-
             // var model = Matrix4.Identity * Matrix4.CreateRotationX((float) MathHelper.DegreesToRadians(time));
             var model = Matrix4.Identity
                         * Matrix4.CreateTranslation(new Vector3(0f, -1.75f, 0f))
                         * Matrix4.CreateScale(.2f);
-            _ourShader.SetMat4("model", model);
+            
+            // first draw all opaque fragments
+            _opaqueShader.Use();
 
-            _ourModel.Draw(_ourShader);
+            _opaqueShader.SetMat4("projection", _camera.GetProjectionMatrix());
+            _opaqueShader.SetMat4("view", _camera.GetViewMatrix());
+            _opaqueShader.SetMat4("model", model);
+
+            _petModel.Draw(_opaqueShader);
+
+            // then all transparent ones, this makes opaque fragments behind transparent ones "visible"
+            _transparentShader.Use();
+
+            _transparentShader.SetMat4("projection", _camera.GetProjectionMatrix());
+            _transparentShader.SetMat4("view", _camera.GetViewMatrix());
+            _transparentShader.SetMat4("model", model);
+
+            _petModel.Draw(_transparentShader);
 
             SwapBuffers();
 
@@ -200,7 +211,7 @@ namespace GUI
             GL.BindVertexArray(0);
             GL.UseProgram(0);
 
-            _ourShader.Dispose();
+            _transparentShader.Dispose();
 
             base.OnUnload();
         }

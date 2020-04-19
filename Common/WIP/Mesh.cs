@@ -7,7 +7,7 @@ namespace Common.WIP
     {
         /*  Mesh Data  */
         private readonly List<Vertex> _vertices;
-        private const int SizeOfVertex = 8 * sizeof(float);
+        private const int SizeOfVertex = 9 * sizeof(float);
         private const int OffsetOfVertexPosition = 0;
         private const int OffsetOfVertexNormal = 3 * sizeof(float);
         private const int OffsetOfVertexTexCoords = 6 * sizeof(float);
@@ -40,7 +40,7 @@ namespace Common.WIP
 
             GL.ActiveTexture(TextureUnit.Texture0);
             shader.SetInt("texture_array", 0);
-            GL.BindTexture(TextureTarget.Texture2D, _textures[0].Id);
+            GL.BindTexture(TextureTarget.Texture2DArray, _textures[0].Id);
             // for (var i = 0; i < _textures.Count; i++)
             // {
             //     // activate proper texture unit before binding
@@ -98,9 +98,9 @@ namespace Common.WIP
             // vertex normals
             GL.EnableVertexAttribArray(1);
             GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, SizeOfVertex, OffsetOfVertexNormal);
-            // vertex texture coords
+            // vertex texture coords (uv + layer nr)
             GL.EnableVertexAttribArray(2);
-            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, SizeOfVertex, OffsetOfVertexTexCoords);
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, SizeOfVertex, OffsetOfVertexTexCoords);
 
             GL.BindVertexArray(0);
         }

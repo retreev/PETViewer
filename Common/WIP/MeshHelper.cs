@@ -38,8 +38,9 @@ namespace Common.WIP
                     {
                         Position = uniqueVertices[ppi.Index],
                         Normal = new Vector3(ppi.X, ppi.Y, ppi.Z),
-                        TexCoords = new Vector2(
-                            ppi.UVMappings[0].U, ppi.UVMappings[0].V)
+                        TexCoords = new Vector3(
+                            ppi.UVMappings[0].U, ppi.UVMappings[0].V,
+                            textureLayerNrByPolyId[polyId])
                     };
                     vertices.Add(vertex);
                     indices.Add((uint) vertexId);

@@ -12,8 +12,7 @@ namespace Common.WIP
         // 3 * float
         public Vector3 Normal;
 
-        // 2 * float
-        public Vector2 TexCoords;
-
+        // 3 * float (XY = UV, Z = Layer)
+        public Vector3 TexCoords;
     }
 }
