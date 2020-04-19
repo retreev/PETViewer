@@ -9,16 +9,22 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="OpenToolkit.Windowing.Desktop" Version="4.0.0-pre8"/>
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Common\Common.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Shader\*"/>
-        <EmbeddedResource Include="Shader\*"/>
+        <None Include="Shaders/**" CopyToOutputDirectory="PreserveNewest"/>
+        <None Include="Resources/**" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="OpenToolkit.Windowing.Desktop" Version="4.0.0-pre8"/>
-    </ItemGroup>
-
+    <Target Name="SpicNSpan" AfterTargets="Clean">
+        <!-- Remove obj folder -->
+        <RemoveDir Directories="$(BaseIntermediateOutputPath)"/>
+        <!-- Remove bin folder -->
+        <RemoveDir Directories="$(BaseOutputPath)"/>
+    </Target>
 </Project>
