@@ -15,11 +15,13 @@ namespace Common.WIP
     public class Model
     {
         private List<Mesh> _meshes;
-        private string _modelDirectory;
+
+        // directory to use as base for searching for textures, TODO currently only uses textures directly in the dir
+        private string _searchDirectory;
 
         public Model(string path)
         {
-            LoadModel(path);
+            LoadModel(new Uri(path).LocalPath);
         }
 
         public void Draw(Shader shader)
@@ -32,12 +34,13 @@ namespace Common.WIP
 
         private void LoadModel(string path)
         {
+            Console.Out.WriteLine($"Loading model file: {path}");
             FileInfo modelFile = new FileInfo(path);
 
-            _modelDirectory = modelFile.Directory?.ToString();
+            _searchDirectory = modelFile.Directory?.ToString();
+            Console.Out.WriteLine($" Search directory: {_searchDirectory}");
 
-            FileStream fileStream =
-                File.OpenRead(modelFile.ToString());
+            FileStream fileStream = File.OpenRead(modelFile.ToString());
             PETFile pet = new PETFile(fileStream);
 
             MeshHelper.CreateVerticesAndIndices(pet, out var vertices, out var indices);
@@ -46,14 +49,14 @@ namespace Common.WIP
 
             // only create an array with all textures for now
             // handling specular textures etc. can be done some other time, hopefully
-            Texture texture = new Texture
+            Texture textureArray = new Texture
             {
                 // Path = petTexturePath,
                 Id = LoadTextures(pet),
-                Type = "texture_array"
+                Type = TextureType.TextureArray
             };
 
-            textures.Add(texture);
+            textures.Add(textureArray);
 
             _meshes = new List<Mesh>
             {
@@ -73,7 +76,8 @@ namespace Common.WIP
             // List<RawImage> images = new List<RawImage>();
             for (var i = 0; i < layerCount; i++)
             {
-                string petTexturePath = Path.Combine(_modelDirectory, petTextures[i].FileName);
+                string petTexturePath = Path.Combine(_searchDirectory, petTextures[i].FileName);
+                Console.Out.WriteLine($" Trying to load texture: {MakeRelative(petTexturePath)}");
                 byte[] data = LoadImageAsBytes(petTexturePath, maxWidth, maxHeight, out var width, out var height,
                     out var isMasked);
 
@@ -139,7 +143,7 @@ namespace Common.WIP
             image.Mutate(x => x.Resize(maxWidth, maxHeight));
 
             Debug.Assert(width <= maxWidth && height <= maxHeight);
-            Console.Out.WriteLine($"Width: {width}, Height: {height}");
+            Console.Out.WriteLine($"  Width: {width}, Height: {height}");
 
             // Get an array of the pixels, in ImageSharp's internal format.
             Rgba32[] tempPixels = image.GetPixelSpan().ToArray();
@@ -150,7 +154,7 @@ namespace Common.WIP
             Rgba32[] maskTempPixels = null;
             if (isMasked)
             {
-                Console.Out.WriteLine($"Loading mask for '{path}': {maskPath}");
+                Console.Out.WriteLine($"  Found mask for alpha channel: {MakeRelative(maskPath)}");
                 Image<Rgba32> maskImage = Image.Load<Rgba32>(maskPath);
                 // maskImage.Mutate(x => x.Flip(FlipMode.Vertical));
 
@@ -185,6 +189,11 @@ namespace Common.WIP
         {
             maskPath = path.Replace(".jpg", "_mask.jpg");
             return new FileInfo(maskPath).Exists;
+        }
+
+        private string MakeRelative(string path)
+        {
+            return path.Substring(_searchDirectory.Length + 1); // add char for dir separator
         }
     }
 

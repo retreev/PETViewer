@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using OpenToolkit.Graphics.OpenGL4;
 
@@ -5,15 +6,17 @@ namespace Common.WIP
 {
     public class Mesh
     {
+        private const int StrideOfVector3 = 3 * sizeof(float);
+
         /*  Mesh Data  */
         private readonly List<Vertex> _vertices;
-        private const int SizeOfVertex = 9 * sizeof(float);
+        private const int StrideOfVertex = 3 * StrideOfVector3;
         private const int OffsetOfVertexPosition = 0;
-        private const int OffsetOfVertexNormal = 3 * sizeof(float);
-        private const int OffsetOfVertexTexCoords = 6 * sizeof(float);
+        private const int OffsetOfVertexNormal = 1 * StrideOfVector3;
+        private const int OffsetOfVertexTexCoords = 2 * StrideOfVector3;
 
         private readonly List<uint> _indices;
-        private const int SizeOfUint = sizeof(uint);
+        private const int StrideOfUint = sizeof(uint);
 
         private readonly List<Texture> _textures;
 
@@ -32,35 +35,23 @@ namespace Common.WIP
         // render the mesh
         public void Draw(Shader shader)
         {
-            // bind appropriate textures
-            uint diffuseNr = 1;
-            uint specularNr = 1;
-            uint normalNr = 1;
-            uint heightNr = 1;
+            for (var i = 0; i < _textures.Count; i++)
+            {
+                TextureType textureType = _textures[i].Type;
 
-            GL.ActiveTexture(TextureUnit.Texture0);
-            shader.SetInt("texture_array", 0);
-            GL.BindTexture(TextureTarget.Texture2DArray, _textures[0].Id);
-            // for (var i = 0; i < _textures.Count; i++)
-            // {
-            //     // activate proper texture unit before binding
-            //     GL.ActiveTexture((TextureUnit) ((int) TextureUnit.Texture0 + i));
-            //     // retrieve texture number (the N in diffuse_textureN)
-            //     string name = _textures[i].Type;
-            //     string number = name switch
-            //     {
-            //         "texture_diffuse" => (diffuseNr++).ToString(),
-            //         "texture_specular" => (specularNr++).ToString(),
-            //         "texture_normal" => (normalNr++).ToString(),
-            //         "texture_height" => (heightNr++).ToString(),
-            //         _ => ""
-            //     };
-            //
-            //     // now set the sampler to the correct texture unit
-            //     shader.SetInt($"{name}{number}", i);
-            //     // and finally bind the texture
-            //     GL.BindTexture(TextureTarget.Texture2D, _textures[i].Id);
-            // }
+                // activate proper texture unit before binding
+                GL.ActiveTexture((TextureUnit) ((int) TextureUnit.Texture0 + i));
+
+                if (TextureType.TextureArray == textureType)
+                {
+                    shader.SetInt(textureType.ToString(), 0);
+                    GL.BindTexture(TextureTarget.Texture2DArray, _textures[i].Id);
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Ignoring unknown texture type: {textureType}");
+                }
+            }
 
             // draw mesh
             GL.BindVertexArray(_vao);
@@ -84,23 +75,23 @@ namespace Common.WIP
             // A great thing about structs is that their memory layout is sequential for all its items.
             // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
             // again translates to 3/2 floats which translates to a byte array.
-            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Count * SizeOfVertex, _vertices.ToArray(),
+            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Count * StrideOfVertex, _vertices.ToArray(),
                 BufferUsageHint.StaticDraw);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ebo);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Count * SizeOfUint, _indices.ToArray(),
+            GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Count * StrideOfUint, _indices.ToArray(),
                 BufferUsageHint.StaticDraw);
 
             // set the vertex attribute pointers
             // vertex Positions
             GL.EnableVertexAttribArray(0);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, SizeOfVertex, OffsetOfVertexPosition);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, StrideOfVertex, OffsetOfVertexPosition);
             // vertex normals
             GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, SizeOfVertex, OffsetOfVertexNormal);
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, StrideOfVertex, OffsetOfVertexNormal);
             // vertex texture coords (uv + layer nr)
             GL.EnableVertexAttribArray(2);
-            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, SizeOfVertex, OffsetOfVertexTexCoords);
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, StrideOfVertex, OffsetOfVertexTexCoords);
 
             GL.BindVertexArray(0);
         }
