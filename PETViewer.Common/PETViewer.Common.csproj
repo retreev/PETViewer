@@ -8,9 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="OpenToolkit.Graphics" Version="4.0.0-pre8" />
+        <PackageReference Include="OpenToolkit.Graphics" Version="4.0.0-pre9.1" />
         <PackageReference Include="PangLib.PET" Version="5.2.0" />
-        <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0007" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-rc0001" />
     </ItemGroup>
 
     <Target Name="SpicNSpan" AfterTargets="Clean">

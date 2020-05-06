@@ -6,7 +6,6 @@ using System.Linq;
 using OpenToolkit.Graphics.OpenGL4;
 using PangLib.PET;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
@@ -148,7 +147,9 @@ namespace PETViewer.Common.Model
             Console.Out.WriteLine($"  Width: {width}, Height: {height}");
 
             // Get an array of the pixels, in ImageSharp's internal format.
-            Rgba32[] tempPixels = image.GetPixelSpan().ToArray();
+            // TODO throw exception if TryGet fails??
+            image.TryGetSinglePixelSpan(out var pixelSpan);
+            Rgba32[] tempPixels = pixelSpan.ToArray();
 
             // TODO make better
             // Check if a mask for this file exist and if yes, use it's Red channel for the textures Alpha
@@ -163,7 +164,11 @@ namespace PETViewer.Common.Model
                 // TODO remove
                 image.Mutate(x => x.Resize(maxWidth, maxHeight));
 
-                maskTempPixels = maskImage.GetPixelSpan().ToArray();
+                if (maskImage.TryGetSinglePixelSpan(out var maskPixelSpan))
+                {
+                    maskTempPixels = maskPixelSpan.ToArray();
+                }
+                // TODO what if TryGet fails?
             }
 
             // Convert ImageSharp's format into a byte array, so we can use it with OpenGL.
